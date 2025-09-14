@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sparkles, X, Download, Share, RotateCcw, Heart } from 'lucide-react';
 
-function FullscreenView({ selectedImage, setSelectedImageId, isGenerating, toggleFavorite }) {
+function FullscreenView({ selectedImage, setSelectedImageId, isGenerating, toggleFavorite, handleGenerate }) {
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end">
             <div className="bg-white rounded-t-2xl w-full max-h-[80vh] overflow-y-scroll no-scrollbar">
@@ -19,7 +19,7 @@ function FullscreenView({ selectedImage, setSelectedImageId, isGenerating, toggl
                     <div className="flex items-center gap-2 ml-auto">
                         {/* Generate Poses */}
                         <button
-                            onClick={() => { }}
+                            onClick={handleGenerate}
                             disabled={isGenerating}
                             title="Generate 4 pose variations from this image"
                             aria-label="Generate 4 poses"

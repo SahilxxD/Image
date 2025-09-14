@@ -7,6 +7,7 @@ import Header from './components/Header';
 import LoadingOverlay from './components/LoadingOverlay';
 import SettingsScreen from './components/SettingsScreen';
 import DetectionBadge from './components/DetectionBadge';
+import GenerateMoreModal from './components/GenerateMoreModal';
 
 // Design tokens
 const tokens = {
@@ -52,6 +53,7 @@ function App() {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+  const [showGenerateMoreModal, setShowGeneratMoreModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [selectedImageId, setSelectedImageId] = useState(null);
@@ -64,6 +66,8 @@ function App() {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [isDetected, setIsDetected] = useState(false);
+  const [isPoseGenerating, setIsPoseGenerating] = useState(false);
+
 
   const fileInputRef = useRef(null);
   const styleSelectionRef = useRef(null);
@@ -117,16 +121,18 @@ function App() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     setCurrentScreen('gallery');
+    setSelectedImageId(null);
 
     // Simulate generation process
     setTimeout(() => {
       setGeneratedImages(mockGeneratedImages);
       setIsGenerating(false);
-    }, 10000);
+    }, 5000);
   };
 
   const handleCustomizeGenerate = () => {
     setShowCustomizeModal(false);
+    setShowGeneratMoreModal(false);
     handleGenerate();
   };
 
@@ -185,9 +191,7 @@ function App() {
                 <h1 className="text-lg font-semibold text-gray-900 mb-2">
                   Create stunning product images
                 </h1>
-                <p className="text-sm text-gray-600 mb-6">
-                  Upload product image — PNG or JPG. We auto-detect category and suggest templates.
-                </p>
+
 
                 {uploadedImage ? (
                   <div className="space-y-4">
@@ -195,7 +199,7 @@ function App() {
                       <img
                         src={uploadedImage.url}
                         alt="Uploaded product"
-                        className="w-32 h-32 object-cover rounded-xl mx-auto border border-gray-200"
+                        className="w-48 h-48 object-cover rounded-xl mx-auto border border-gray-200"
                       />
                       <button
                         onClick={() => setUploadedImage(null)}
@@ -212,7 +216,9 @@ function App() {
                   </div>
                 ) : (
                   <>
-
+                    <p className="text-sm text-gray-600 mb-6">
+                      Upload product image — PNG or JPG. We auto-detect category and suggest templates.
+                    </p>
                     <div
                       onClick={() => fileInputRef.current?.click()}
                       className="border-2 border-dashed border-gray-300 rounded-xl p-8 cursor-pointer hover:border-purple-400 transition-colors"
@@ -238,7 +244,7 @@ function App() {
 
             {/* Animated Slideshow */}
 
-            <div className={`mx-2 mt-6 relative h-0 space-y-4 ${showSlideshow ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`  h-0  ${showSlideshow ? 'relative opacity-100 mx-2 mt-6 space-y-4' : 'opacity-0'}`}>
               {/* Left to Right Slider */}
               <div
                 className={`relative overflow-hidden rounded-xl shadow-sm w-full h-0 transition-opacity duration-400 ${showSlideshow ? 'opacity-100 h-40' : 'opacity-0'
@@ -303,8 +309,12 @@ function App() {
             <div ref={containerRef} className={`mt-2 w-full h-0 ${isDetected ? 'opacity-100 translate-y-0 h-full' : 'opacity-0 -translate-y-3 pointer-events-none'} transition-all duration-600`}>
               {/* Type Selection */}
               <div ref={styleSelectionRef} className="space-y-3">
-                <h2 className="font-medium text-gray-900">Choose style</h2>
-
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
+                  <h2 className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    Choose Your Vibe
+                  </h2>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={handleStyleSelection}
@@ -322,7 +332,7 @@ function App() {
                       />
                     </div>
                     <h3 className="font-medium text-sm text-gray-900 mb-1">Model Showcase</h3>
-                    <p className="text-xs text-purple-600 mt-1">Studio</p>
+                    <p className="text-xs text-purple-600 mt-1">Styled on models</p>
                   </button>
 
                   <button
@@ -340,7 +350,7 @@ function App() {
                       />
                     </div>
                     <h3 className="font-medium text-sm text-gray-900 mb-1">Flat-lay</h3>
-                    <p className="text-xs text-purple-600 mt-1">Creative</p>
+                    <p className="text-xs text-purple-600 mt-1">Product only</p>
                   </button>
                 </div>
               </div>
@@ -381,7 +391,7 @@ function App() {
 
         {/* Gallery Screen */}
         {currentScreen === 'gallery' && (
-          <GalleryScreen generatedImages={generatedImages} setShowCustomizeModal={setShowCustomizeModal} openFullscreen={openFullscreen} toggleFavorite={toggleFavorite} isGenerating={isGenerating} batchSize={customizeOptions.batchSize} />
+          <GalleryScreen generatedImages={generatedImages} openFullscreen={openFullscreen} toggleFavorite={toggleFavorite} isGenerating={isGenerating} batchSize={customizeOptions.batchSize} setShowGeneratMoreModal={setShowGeneratMoreModal} />
         )}
 
         {/* Fullscreen View */}
@@ -391,6 +401,7 @@ function App() {
             setSelectedImageId={setSelectedImageId}
             isGenerating={isGenerating}
             toggleFavorite={toggleFavorite}
+            handleGenerate={handleGenerate}
           />
         )}
 
@@ -409,6 +420,18 @@ function App() {
           customizeOptions={customizeOptions}
           setShowCustomizeModal={setShowCustomizeModal}
           handleCustomizeGenerate={handleCustomizeGenerate}
+          setCustomizeOptions={setCustomizeOptions}
+        />
+
+      )}
+      {showGenerateMoreModal && (
+        <GenerateMoreModal
+          showCustomizeModal={showCustomizeModal}
+          setShowGeneratMoreModal={setShowCustomizeModal}
+          handleCustomizeGenerate={handleCustomizeGenerate}
+          setCustomizeOptions={setCustomizeOptions}
+          customizeOptions={customizeOptions}
+
         />
 
       )}
