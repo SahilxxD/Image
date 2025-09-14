@@ -186,8 +186,8 @@ function App() {
               } p-4 space-y-6 transition-all`}
           > */}
             {/* Upload Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="text-center">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 w-full max-w-md mx-auto">
+              <div className="text-center ">
                 <h1 className="text-lg font-semibold text-gray-900 mb-2">
                   Create stunning product images
                 </h1>
