@@ -1,0 +1,4 @@
+- [x] Revert gallery modal changes
+- [x] Modify fullscreen view to be a modal
+- [x] Add backdrop blur to modal
+- [x] Test the modal display
