@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Upload, Sparkles, Grid, Settings, Download, Share, RotateCcw, X, Check, ChevronRight, ArrowLeft, Heart, Info, Zap, Palette } from 'lucide-react';
 import CustomizeModal from './components/CustomizeModal';
 import FullscreenView from './components/FullscreenView';
@@ -59,21 +59,21 @@ function App() {
   const [selectedImageId, setSelectedImageId] = useState(null);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [customizeOptions, setCustomizeOptions] = useState({
-    poses: ['front', 'three-quarter', 'walking'],
     environment: 'studio',
     outputs: ['catalog'],
-    batchSize: 4
+    batchSize: 2
   });
   const [isUploading, setIsUploading] = useState(false);
   const [isDetected, setIsDetected] = useState(false);
-  const [isPoseGenerating, setIsPoseGenerating] = useState(false);
-
+  const [originalFile, setOriginalFile] = useState(null);
 
   const fileInputRef = useRef(null);
   const styleSelectionRef = useRef(null);
   // near your other refs and useState
   const actionsRef = useRef(null);
   const containerRef = useRef(null);
+
+
 
   // Mock data for demonstration
   const mockGeneratedImages = [
@@ -90,45 +90,208 @@ function App() {
     'https://ik.imagekit.io/efhehcx94/1000039585.png?updatedAt=1757786299011',
   ];
 
+  useEffect(() => {
+    if (uploadedImage) {
+      console.log("Uploaded image state updated:", uploadedImage);
+    }
+  }, [uploadedImage]);
 
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      // Mock category detection
-      const categories = ['Dress', 'Shirt', 'Shoes', 'Accessories'];
-      const category = categories[Math.floor(Math.random() * categories.length)];
-      setShowSlideshow(true);
-      setUploadedImage({ url, category });
-      setIsUploading(true);
-      setIsDetected(false);
+    if (!file) return;
 
-      // Auto-scroll to style selection after upload
-      setTimeout(() => {
-        styleSelectionRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-        setShowSlideshow(false);
-        setIsUploading(false);
-        setIsDetected(true);
+    // Step 1: Show local preview immediately
+    const url = URL.createObjectURL(file);
+    setUploadedImage({ url });
+    setOriginalFile(file); // Store the original file for later use
+    setIsUploading(true);
+    setIsDetected(false);
+    setShowSlideshow(true);
 
-      }, 5000);
+    try {
+      // Step 2: Prepare FormData for Multer
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // Step 3: Upload to backend
+      const res = await fetch("https://image-backend-delta.vercel.app/api/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!res.ok) {
+        console.error("Upload failed with status:", res.status);
+        // throw new Error("Upload failed");
+      }
+
+      const response = await res.json();
+      console.log("Backend response:", response);
+
+      // Step 4: Access the nested data object
+      const { data } = response; // Extract the data object
+      console.log("Extracted data:", data);
+
+      // Update uploadedImage with backend data from the nested object
+      const updatedImage = {
+        url,
+        category: data.product,   // Now accessing from data object
+        product: data.category      // Now accessing from data object
+      };
+
+      setUploadedImage(updatedImage);
+      console.log("Setting uploadedImage to:", updatedImage);
+
+      // Step 5: Auto-scroll after detection
+      styleSelectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
+      setIsDetected(true);
+    } catch (error) {
+      console.error("Upload error:", error);
+      setIsDetected(true);
+      alert("Failed to upload file.");
+    } finally {
+      setIsUploading(false);
+      setShowSlideshow(false);
     }
   };
 
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    setCurrentScreen('gallery');
-    setSelectedImageId(null);
 
-    // Simulate generation process
-    setTimeout(() => {
-      setGeneratedImages(mockGeneratedImages);
+
+
+  const handleGenerate = async () => {
+    if (!originalFile) {
+      alert("No file available for generation. Please upload an image first.");
+      return;
+    }
+
+    try {
+      validateGenerationInputs(); // should throw on invalid input
+      setIsGenerating(true);
+      setCurrentScreen('gallery');
+      setSelectedImageId(null);
+
+      console.log(" Selected type:", selectedType);
+      console.log("Generating with options:", customizeOptions);
+      console.log("Using original file:", originalFile.name);
+
+      // Build FormData
+      const formData = new FormData();
+      formData.append("file", originalFile);
+      formData.append("type", selectedType || "flat-lay");
+      formData.append("batchSize", String(customizeOptions.batchSize));
+      formData.append("environment", customizeOptions.environment || "complementary");
+      formData.append("product", uploadedImage?.product || uploadedImage?.category || "product");
+
+      console.log("Sending request with FormData:", {
+        file: originalFile.name,
+        type: selectedType,
+        batchSize: customizeOptions.batchSize,
+        environment: customizeOptions.environment,
+        product: uploadedImage?.product || uploadedImage?.category,
+      });
+
+      const response = await fetch("https://image-backend-delta.vercel.app/api/generateImage", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        console.error("API Error Response:", response.status, response.statusText, errorText);
+        throw new Error(`Generation failed: ${response.status} ${response.statusText} ${errorText ? "- " + errorText : ""}`);
+      }
+
+      const result = await response.json();
+      console.log("Raw Generation API result:", result);
+
+      // Normalize the payload: support both { success, data: {...} } and { successful, results } formats
+      const payload = result?.data ?? result ?? {};
+      const successfulCount = Number((payload.successful ?? payload.success) || 0);
+      const failedCount = Number(payload.failed ?? payload.failedCount ?? 0);
+      const results = Array.isArray(payload.results) ? payload.results : (Array.isArray(result?.results) ? result.results : []);
+
+      console.log("Normalized payload:", { successfulCount, failedCount, results });
+
+      if (successfulCount > 0 && results.length > 0) {
+        const transformedImages = results
+          .map((img, index) => {
+            // img might be a string URL or an object { url, imageIndex }
+            const url = typeof img === "string" ? img : (img.url || img.uploadResult || null);
+            if (!url) return null;
+            return {
+              id: `generated-${Date.now()}-${index}`,
+              url,
+              pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
+              environment: customizeOptions.environment,
+              outputType: 'generated',
+              isHighRes: true,
+              isFavorited: false,
+              imageIndex: img.imageIndex ?? index + 1,
+            };
+          })
+          .filter(Boolean);
+
+        setGeneratedImages(transformedImages);
+        console.log("Successfully generated images:", transformedImages);
+
+        if (failedCount > 0) {
+          console.warn(`Generated ${successfulCount} images, but ${failedCount} failed:`, payload.errors ?? []);
+          alert(`Successfully generated ${successfulCount} out of ${customizeOptions.batchSize} images.`);
+        }
+      } else if (payload.url || result.url) {
+        // single-image shapes
+        const url = payload.url ?? result.url;
+        const singleImage = [{
+          id: `generated-${Date.now()}`,
+          url,
+          pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
+          environment: customizeOptions.environment,
+          outputType: 'generated',
+          isHighRes: true,
+          isFavorited: false
+        }];
+        setGeneratedImages(singleImage);
+        console.log("Successfully generated single image:", singleImage);
+      } else {
+        console.warn("No images found in normalized payload. Full result:", result);
+        throw new Error("No images generated or invalid response format");
+      }
+
+    } catch (error) {
+      console.error("Generation error:", error);
+      let errorMessage = "Failed to generate images. ";
+
+      if (String(error.message).includes('Failed to fetch')) {
+        errorMessage += "Please check if the server is running.";
+      } else if (String(error.message).includes('500')) {
+        errorMessage += "Server error occurred. Please try again.";
+      } else if (String(error.message).includes('400')) {
+        errorMessage += "Invalid request. Please check your inputs.";
+      } else {
+        errorMessage += error.message || String(error);
+      }
+
+      alert(errorMessage);
+      setCurrentScreen('upload');
+    } finally {
       setIsGenerating(false);
-    }, 5000);
+    }
   };
+
+
+  const validateGenerationInputs = () => {
+    if (!originalFile) throw new Error("No file uploaded");
+    if (!selectedType) throw new Error("No generation type selected");
+    if (!customizeOptions.batchSize || customizeOptions.batchSize < 1 || customizeOptions.batchSize > 4)
+      throw new Error("Invalid batch size (1-4 allowed)");
+    if (!uploadedImage?.product && !uploadedImage?.category) throw new Error("Product information missing");
+    return true;
+  };
+
 
   const handleCustomizeGenerate = () => {
     setShowCustomizeModal(false);
@@ -137,7 +300,7 @@ function App() {
   };
 
   const handleStyleSelection = () => {
-    setSelectedType('model');
+    setSelectedType('on-model');
 
     setTimeout(() => {
       window.scrollBy({
@@ -319,7 +482,7 @@ function App() {
                   <button
                     onClick={handleStyleSelection}
 
-                    className={`p-4 rounded-xl border-2 transition-all ${selectedType === 'model'
+                    className={`p-4 rounded-xl border-2 transition-all ${selectedType === 'on-model'
                       ? 'border-purple-500 bg-purple-50'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                       }`}
@@ -336,8 +499,8 @@ function App() {
                   </button>
 
                   <button
-                    onClick={() => setSelectedType('creative')}
-                    className={`p-4 rounded-xl border-2 transition-all ${selectedType === 'creative'
+                    onClick={() => setSelectedType('flat-lay')}
+                    className={`p-4 rounded-xl border-2 transition-all ${selectedType === 'flat-lay'
                       ? 'border-purple-500 bg-purple-50'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                       }`}
