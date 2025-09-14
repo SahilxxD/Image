@@ -237,44 +237,44 @@ function App() {
             </div>
 
             {/* Animated Slideshow */}
-            {showSlideshow && (
-              <div className="mx-2 mt-6 relative space-y-4">
-                {/* Left to Right Slider */}
-                <div
-                  className={`relative overflow-hidden rounded-xl shadow-sm w-full h-40 transition-opacity duration-400 ${showSlideshow ? 'opacity-100' : 'opacity-0'
-                    }`}
-                >
-                  <div className="flex animate-scroll-ltr whitespace-nowrap">
-                    {[...placeholderImages, ...placeholderImages].map((img, idx) => (
-                      <img
-                        key={`ltr-${idx}`}
-                        src={img}
-                        alt={`Placeholder ${idx}`}
-                        className="w-64 h-40 object-cover rounded-xl mr-3 flex-shrink-0"
-                      />
-                    ))}
-                  </div>
-                </div>
 
-                {/* Right to Left Slider */}
-                <div
-                  className={`relative overflow-hidden rounded-xl shadow-sm w-full h-40 transition-opacity duration-400 ${showSlideshow ? 'opacity-100' : 'opacity-0'
-                    }`}
-                >
-                  <div className="flex animate-scroll-rtl whitespace-nowrap">
-                    {[...placeholderImages, ...placeholderImages].map((img, idx) => (
-                      <img
-                        key={`rtl-${idx}`}
-                        src={img}
-                        alt={`Placeholder ${idx}`}
-                        className="w-64 h-40 object-cover rounded-xl mr-3 flex-shrink-0"
-                      />
-                    ))}
-                  </div>
+            <div className={`mx-2 mt-6 relative h-0 space-y-4 ${showSlideshow ? 'opacity-100' : 'opacity-0'}`}>
+              {/* Left to Right Slider */}
+              <div
+                className={`relative overflow-hidden rounded-xl shadow-sm w-full h-0 transition-opacity duration-400 ${showSlideshow ? 'opacity-100 h-40' : 'opacity-0'
+                  }`}
+              >
+                <div className="flex animate-scroll-ltr whitespace-nowrap">
+                  {[...placeholderImages, ...placeholderImages].map((img, idx) => (
+                    <img
+                      key={`ltr-${idx}`}
+                      src={img}
+                      alt={`Placeholder ${idx}`}
+                      className="w-64 h-40 object-cover rounded-xl mr-3 flex-shrink-0"
+                    />
+                  ))}
                 </div>
+              </div>
 
-                {/* Scroll Animations */}
-                <style>{`
+              {/* Right to Left Slider */}
+              <div
+                className={`relative overflow-hidden rounded-xl shadow-sm w-full h-0 transition-opacity duration-400 ${showSlideshow ? 'opacity-100 h-40' : 'opacity-0'
+                  }`}
+              >
+                <div className="flex animate-scroll-rtl whitespace-nowrap">
+                  {[...placeholderImages, ...placeholderImages].map((img, idx) => (
+                    <img
+                      key={`rtl-${idx}`}
+                      src={img}
+                      alt={`Placeholder ${idx}`}
+                      className="w-64 h-40 object-cover rounded-xl mr-3 flex-shrink-0"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Scroll Animations */}
+              <style>{`
       /* Left → Right */
       @keyframes scroll-ltr {
         0% { transform: translateX(0); }
@@ -294,8 +294,8 @@ function App() {
         animation: scroll-rtl 15s linear infinite;
       }
     `}</style>
-              </div>
-            )}
+            </div>
+
 
 
 
