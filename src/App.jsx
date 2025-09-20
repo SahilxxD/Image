@@ -81,7 +81,7 @@ function App() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/me", {
+      const response = await fetch("https://image-backend-delta.vercel.app/api/me", {
         method: "GET",
         headers: {
           ...getAuthHeaders(),
@@ -274,7 +274,7 @@ function App() {
         product: uploadedImage?.product || uploadedImage?.category,
       });
 
-      const response = await fetch("http://localhost:5000/api/generatePoses", {
+      const response = await fetch("https://image-backend-delta.vercel.app/api/generatePoses", {
         method: "POST",
         headers: { ...getAuthHeaders() },
         body: formData,
@@ -416,7 +416,7 @@ function App() {
         product: uploadedImage?.product || uploadedImage?.category,
       });
 
-      const response = await fetch("http://localhost:5000/api/generateImage", {
+      const response = await fetch("https://image-backend-delta.vercel.app/api/generateImage", {
         method: "POST",
         headers: { ...getAuthHeaders() },
         body: formData,
@@ -562,7 +562,7 @@ function App() {
       // → backend redirects to Google login
       // → Google redirects back to your backend /google/callback
       // → backend issues a JWT & redirects to your frontend
-      window.location.href = "http://localhost:5000/api/google";
+      window.location.href = "https://image-backend-delta.vercel.app/api/google";
     } catch (error) {
       console.error("Login error:", error);
       alert(`Failed to log in: ${error.message}`);

@@ -91,7 +91,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
         setError(null); // optional state if you have one
 
         try {
-            const res = await fetch("http://localhost:5000/api/history", {
+            const res = await fetch("https://image-backend-delta.vercel.app/api/history", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
