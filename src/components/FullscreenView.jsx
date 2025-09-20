@@ -97,13 +97,13 @@ function FullscreenView({
 
                         <div className="flex items-center gap-2 ml-auto">
                             <button
-                                onClick={() => handleGeneratePoses && handleGeneratePoses(selectedImage)}
+                                onClick={() => handleGeneratePoses(selectedImage)}
                                 disabled={isGenerating}
                                 title="Generate 4 pose variations from this image"
                                 aria-label="Generate 4 poses"
                                 aria-busy={isGenerating}
                                 className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium shadow-sm transition-all h-9
-                  ${isGenerating ? 'bg-purple-400/80 text-white cursor-wait' : 'bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:brightness-105'} ${selectedImage?.pose !== 'on-model' ? 'hidden' : ''}`}
+                  ${isGenerating ? 'bg-purple-400/80 text-white cursor-wait' : 'bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:brightness-105'} ${selectedImage?.type !== 'on-model' ? 'hidden' : ''}`}
                             >
                                 {isGenerating ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Sparkles size={16} className="text-white" />}
                                 <span>Generate Poses</span>

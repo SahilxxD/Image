@@ -6,6 +6,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
     const [historyImages, setHistoryImages] = useState([]);
     const [filter, setFilter] = useState('all'); // all, favorites, recent
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null); // optional error state
 
     // Mock history data - replace with actual API call
     const mockHistoryData = [
@@ -13,6 +14,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
             id: 'hist-1',
             url: 'https://ik.imagekit.io/efhehcx94/1000039585.png?updatedAt=1757786299011&tr=w-1080%2Ch-1080%2Cfo-auto',
             pose: 'front',
+            type: 'on-model',
             environment: 'studio',
             outputType: 'catalog',
             isHighRes: true,
@@ -25,6 +27,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
             url: 'https://ik.imagekit.io/efhehcx94/1000039500.png?updatedAt=1757786299006&tr=w-1080%2Ch-1080%2Cfo-auto',
             pose: 'three-quarter',
             environment: 'studio',
+            type: 'on-model',
             outputType: 'catalog',
             isHighRes: true,
             isFavorited: false,
@@ -36,6 +39,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
             url: 'https://ik.imagekit.io/efhehcx94/1000039767.png?updatedAt=1757786298897&tr=w-1080%2Ch-1080%2Cfo-auto',
             pose: 'walking',
             environment: 'outdoor',
+            type: 'on-model',
             outputType: 'instagram',
             isHighRes: true,
             isFavorited: true,
@@ -47,6 +51,8 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
             url: 'https://ik.imagekit.io/efhehcx94/1000039641.png?updatedAt=1757786298791&tr=w-1080%2Ch-1080%2Cfo-auto',
             pose: 'closeup',
             environment: 'studio',
+            type: 'on-model',
+
             outputType: 'catalog',
             isHighRes: true,
             isFavorited: false,
@@ -59,6 +65,8 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
             pose: 'flat-lay',
             environment: 'minimal',
             outputType: 'catalog',
+            type: 'on-model',
+
             isHighRes: true,
             isFavorited: true,
             createdAt: '2025-01-13T09:15:00Z',
@@ -70,6 +78,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
             pose: 'front',
             environment: 'studio',
             outputType: 'social',
+            type: 'on-model',
             isHighRes: true,
             isFavorited: false,
             createdAt: '2025-01-12T16:30:00Z',
@@ -77,23 +86,65 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
         }
     ];
 
-    useEffect(() => {
-        // Simulate API call
-        const fetchHistory = async () => {
-            setLoading(true);
-            // In real app, make API call here
-            setTimeout(() => {
-                setHistoryImages(mockHistoryData);
-                // Also update the parent component's history images for fullscreen access
-                if (setParentHistoryImages) {
-                    setParentHistoryImages(mockHistoryData);
-                }
-                setLoading(false);
-            }, 500);
-        };
+    const fetchHistory = async (signal) => {
+        setLoading(true);
+        setError(null); // optional state if you have one
 
-        fetchHistory();
+        try {
+            const res = await fetch("http://localhost:5000/api/history", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    // If your API requires auth, add it here:
+                    "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+                },
+                signal,
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status} ${res.statusText}`);
+            }
+
+            const json = await res.json();
+            // adapt depending on your API shape - if you return { success, data }:
+            const data = json.data ?? json; // fallback to raw response if not wrapped
+            console.log("Fetched history data:", data);
+            const normalized = data.map(img => ({
+                ...img,
+                id: img.id ?? img._id,
+                url: img.imageUrl ?? img.url
+            }));
+
+
+            // update local state and parent callback (same as your mock behavior)
+            setHistoryImages(Array.isArray(normalized) ? normalized : []);
+            if (typeof setParentHistoryImages === "function") {
+                setParentHistoryImages(Array.isArray(normalized) ? normalized : []);
+            }
+        } catch (err) {
+            if (err.name === "AbortError") {
+                // request was cancelled — ignore
+                console.log("fetchHistory aborted");
+            } else {
+                console.error("fetchHistory error:", err);
+                // optional: set an error state to show to the user
+                setError?.(err.message || "Failed to fetch history");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
+        const controller = new AbortController();
+        fetchHistory(controller.signal);
+
+        return () => {
+            controller.abort();
+        };
     }, []);
+
 
     const filteredImages = historyImages.filter(image => {
         if (filter === 'favorites') return image.isFavorited;
@@ -148,30 +199,6 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
                 </button>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-                {[
-                    { key: 'all', label: 'All', count: historyImages.length },
-                    { key: 'favorites', label: 'Favorites', count: historyImages.filter(img => img.isFavorited).length },
-                    {
-                        key: 'recent', label: 'Recent', count: historyImages.filter(img => {
-                            const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                            return new Date(img.createdAt) > dayAgo;
-                        }).length
-                    }
-                ].map(tab => (
-                    <button
-                        key={tab.key}
-                        onClick={() => setFilter(tab.key)}
-                        className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${filter === tab.key
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                    >
-                        {tab.label} ({tab.count})
-                    </button>
-                ))}
-            </div>
 
             {/* Images Grid */}
             <div className="space-y-6">
@@ -225,8 +252,8 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
                                                         );
                                                     }}
                                                     className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${image.isFavorited
-                                                            ? "bg-red-100 text-red-600"
-                                                            : "bg-black/20 text-white hover:bg-black/40"
+                                                        ? "bg-red-100 text-red-600"
+                                                        : "bg-black/20 text-white hover:bg-black/40"
                                                         }`}
                                                 >
                                                     <Heart
@@ -238,7 +265,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
                                             {/* Environment/Type Badge */}
                                             <div className="absolute bottom-2 left-2">
                                                 <span className="px-2 py-1 bg-black/60 text-white text-xs rounded-md">
-                                                    {image.environment}
+                                                    {image.environment ? image.environment.charAt(0).toUpperCase() + image.environment.slice(1) : image.type} - {image.outputType ? image.outputType.charAt(0).toUpperCase() + image.outputType.slice(1) : 'Image'}
                                                 </span>
                                             </div>
                                         </div>

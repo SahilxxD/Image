@@ -127,7 +127,6 @@ function App() {
         setIsLoggedIn(true);
         await fetchUserProfile();
       }
-      setIsLoggedIn(false);
     }
   };
 
@@ -236,14 +235,13 @@ function App() {
   };
 
 
-  const handleGeneratePoses = async () => {
-    if (!originalFile) {
+  const handleGeneratePoses = async (file) => {
+    if (!file) {
       alert("No file available for generation. Please upload an image first.");
       return;
     }
 
     try {
-      validateGenerationInputs(); // should throw on invalid input
       console.log("Inputs validated. Proceeding with generation...", customizeOptions);
       const creditsNeeded = 4; // 1 credit per image
       if (userProfile.credits < creditsNeeded) {
@@ -267,8 +265,9 @@ function App() {
 
       // Build FormData
       const formData = new FormData();
-      formData.append("file", originalFile);
+      formData.append("url", file.url);
       formData.append("product", uploadedImage?.product || uploadedImage?.category || "product");
+      formData.append("environment", file.environment); // always 4 for poses
 
       console.log("Sending request with FormData:", {
         file: originalFile.name,
@@ -307,8 +306,9 @@ function App() {
             return {
               id: `generated-${Date.now()}-${index}`,
               url,
-              pose: customizeOptions.type,
-              environment: customizeOptions.environment,
+              type,
+              pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
+              environment,
               outputType: 'generated',
               isHighRes: true,
               isFavorited: false,
@@ -330,8 +330,9 @@ function App() {
         const singleImage = [{
           id: `generated-${Date.now()}`,
           url,
+          type,
           pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
-          environment: customizeOptions.environment || 'none',
+          environment,
           outputType: 'generated',
           isHighRes: true,
           isFavorited: false
@@ -448,6 +449,7 @@ function App() {
               id: `generated-${Date.now()}-${index}`,
               url,
               pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
+              type,
               environment: customizeOptions.environment,
               outputType: 'generated',
               isHighRes: true,
@@ -470,8 +472,9 @@ function App() {
         const singleImage = [{
           id: `generated-${Date.now()}`,
           url,
+          type,
           pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
-          environment: customizeOptions.environment || 'none',
+          environment,
           outputType: 'generated',
           isHighRes: true,
           isFavorited: false
