@@ -152,10 +152,19 @@ function App() {
   ];
   const placeholderImages = [
     'https://ik.imagekit.io/efhehcx94/1000039500.png?updatedAt=1757786299006&tr=w-1080%2Ch-1080%2Cfo-auto',
-    'https://ik.imagekit.io/efhehcx94/1000039767.png?updatedAt=1757786298897',
-    'https://ik.imagekit.io/efhehcx94/1000039641.png?updatedAt=1757786298791&tr=w-1080%2Ch-1080%2Cfo-auto',
-    'https://ik.imagekit.io/efhehcx94/1000039621.png?updatedAt=1757786296927&tr=w-1080%2Ch-1080%2Cfo-auto',
-    'https://ik.imagekit.io/efhehcx94/1000039585.png?updatedAt=1757786299011',
+    'https://ik.imagekit.io/efhehcx94/generated-1758371816787-2_rzXFc-hYiO.png?updatedAt=1758371819361',
+    'https://ik.imagekit.io/efhehcx94/generated-1758223146611-1_fvC-23o5qs.png?updatedAt=1758223150798',
+    'https://ik.imagekit.io/efhehcx94/generated-1758476830101-1_JcoXvTsHb.png?updatedAt=1758476834481&tr=w-1080%2Ch-1080%2Cfo-auto',
+    'https://ik.imagekit.io/efhehcx94/generated-1757871948563-2_fMExPrI9D.png?updatedAt=1757871951449',
+    'https://ik.imagekit.io/efhehcx94/generated-1758431998778-2_88E6uh9yhb.png?updatedAt=1758432004054',
+    'https://ik.imagekit.io/efhehcx94/generated-1758219602404-2_1vidQQNmml.png?updatedAt=1758219604929',
+    'https://ik.imagekit.io/efhehcx94/generated-1758431998041-1_5DTy1bqJV.png?updatedAt=1758432001969',
+    'https://ik.imagekit.io/efhehcx94/generated-1758372085580-1_bjg7XFaWp.png?updatedAt=1758372088275',
+    'https://ik.imagekit.io/efhehcx94/generated-1758371816787-2_rzXFc-hYiO.png?updatedAt=1758371819361',
+    'https://ik.imagekit.io/efhehcx94/generated-1758367148526-1_j0DQKwTyNc.png?updatedAt=1758367150986',
+    'https://ik.imagekit.io/efhehcx94/generated-1758368571583-1_nwSOskN6SA.png?updatedAt=1758368574199',
+    'https://ik.imagekit.io/efhehcx94/generated-1758359770498-1_b-bh7i0CCm.png?updatedAt=1758359773115',
+    'https://ik.imagekit.io/efhehcx94/generated-1758219602404-2_1vidQQNmml.png?updatedAt=1758219604929'
   ];
 
   useEffect(() => {
