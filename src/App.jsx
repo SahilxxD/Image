@@ -306,9 +306,9 @@ function App() {
             return {
               id: `generated-${Date.now()}-${index}`,
               url,
-              type,
+              type: payload.type,
+              environment: payload.environment,
               pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
-              environment,
               outputType: 'generated',
               isHighRes: true,
               isFavorited: false,
@@ -330,9 +330,9 @@ function App() {
         const singleImage = [{
           id: `generated-${Date.now()}`,
           url,
-          type,
+          type: payload.type,
+          environment: payload.environment,
           pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
-          environment,
           outputType: 'generated',
           isHighRes: true,
           isFavorited: false
@@ -440,6 +440,7 @@ function App() {
       console.log("Normalized payload:", { successfulCount, failedCount, results });
 
       if (successfulCount > 0 && results.length > 0) {
+        console.log("Results array:", results);
         const transformedImages = results
           .map((img, index) => {
             // img might be a string URL or an object { url, imageIndex }
@@ -449,8 +450,8 @@ function App() {
               id: `generated-${Date.now()}-${index}`,
               url,
               pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
-              type,
-              environment: customizeOptions.environment,
+              type: payload.type,
+              environment: payload.environment,
               outputType: 'generated',
               isHighRes: true,
               isFavorited: false,
@@ -472,9 +473,9 @@ function App() {
         const singleImage = [{
           id: `generated-${Date.now()}`,
           url,
-          type,
+          type: payload.type,
+          environment: payload.environment,
           pose: selectedType === 'on-model' ? 'front' : 'flat-lay',
-          environment,
           outputType: 'generated',
           isHighRes: true,
           isFavorited: false
