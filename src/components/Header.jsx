@@ -72,7 +72,7 @@ function Header({ currentScreen, setCurrentScreen, userProfile, onLogout }) {
                     )}
 
                     <div className="flex items-center gap-2">
-                        <div className="w-full h-10 rounded-lg flex items-center justify-center">
+                        <div className="w-full h-12 rounded-lg flex items-center justify-center">
                             <img
                                 src="https://ik.imagekit.io/efhehcx94/1000041191%20(1).webp?updatedAt=1759397920741"
                                 alt="ShotGenie Logo"
