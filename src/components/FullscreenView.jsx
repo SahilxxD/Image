@@ -70,16 +70,27 @@ function FullscreenView({
         prompt('Copy this image URL:', url);
     };
 
-    const handleDownloadClick = () => {
-        const url = selectedImage.url;
+    const handleDownloadClick = async () => {
+        const url = selectedImage?.url;
         if (!url) return;
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = selectedImage.filename || 'image.jpg';
-        a.rel = 'noopener';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = objectUrl;
+            a.download = selectedImage.filename || 'image.jpg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // cleanup
+            URL.revokeObjectURL(objectUrl);
+        } catch (error) {
+            console.error("Download failed:", error);
+        }
     };
 
     return (
