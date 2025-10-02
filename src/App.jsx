@@ -54,7 +54,7 @@ const tokens = {
 function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [historyImages, setHistoryImages] = useState([]); // Add this
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('upload');
   const [uploadedImage, setUploadedImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
