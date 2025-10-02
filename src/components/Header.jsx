@@ -70,11 +70,15 @@ function Header({ currentScreen, setCurrentScreen, userProfile, onLogout }) {
                             <ArrowLeft size={20} className="text-gray-600" />
                         </button>
                     )}
+
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg flex items-center justify-center">
-                            <Sparkles size={16} className="text-white" />
+                        <div className="w-full h-10 rounded-lg flex items-center justify-center">
+                            <img
+                                src="https://ik.imagekit.io/efhehcx94/1000041191%20(1).webp?updatedAt=1759397920741"
+                                alt="ShotGenie Logo"
+                                className="w-full h-full"
+                            />
                         </div>
-                        <span className="font-semibold text-gray-900">Fashion AI</span>
                     </div>
                 </div>
 

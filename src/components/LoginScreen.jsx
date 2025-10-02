@@ -25,7 +25,7 @@ function LoginScreen({ onLogin }) {
             {/* Content: top layer */}
             <div className="relative z-20 text-center pt-16 sm:pt-24">
                 <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-                    Welcome to Vrit Studio
+                    Welcome to Shot Genie
                 </h1>
                 <p className="mt-4 text-base sm:text-lg text-gray-200">
                     Your creative partner for stunning visuals.
