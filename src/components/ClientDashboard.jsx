@@ -23,7 +23,7 @@ const ClientDashboard = ({ client, setCurrentPage }) => {
     const revenueRecieved = client.imageGenerated * client.price;
     const profit = revenueRecieved - client.totalCredits;
 
-    const profitMargin = ((profit / client.totalCredits) * 100).toFixed(2);
+    const profitMargin = ((profit / revenueRecieved) * 100).toFixed(2);
     const costRecovery = ((revenueRecieved / client.totalCredits) * 100).toFixed(2);
     const costPerImage = (client.totalCredits / client.imageGenerated).toFixed(2);
     const clientPaysPerImage = client.price.toFixed(2);
