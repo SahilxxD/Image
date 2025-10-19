@@ -9,6 +9,8 @@ import SettingsScreen from './components/SettingsScreen';
 import DetectionBadge from './components/DetectionBadge';
 import GenerateMoreModal from './components/GenerateMoreModal';
 import LoginScreen from './components/LoginScreen'; // NEW
+import ClientDashboard from './components/ClientDashboard'; // Add this import
+import ClientsScreen from './components/ClientsScreen';
 import HistoryScreen from './components/HistoryScreen'; // Add this import
 
 
@@ -54,7 +56,7 @@ const tokens = {
 function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [historyImages, setHistoryImages] = useState([]); // Add this
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [currentScreen, setCurrentScreen] = useState('upload');
   const [uploadedImage, setUploadedImage] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
@@ -846,7 +848,18 @@ function App() {
                 toggleFavorite={toggleFavorite}
                 setHistoryImages={setHistoryImages} // Add this prop
               />
+              // <HistoryScreen />
             )}
+
+            {
+              currentScreen === 'clients' && (
+                <ClientsScreen
+                  openFullscreen={openFullscreen}
+                  toggleFavorite={toggleFavorite}
+                  setHistoryImages={setHistoryImages} // Add this prop
+                />
+              )
+            }
 
 
             {/* Settings Screen */}

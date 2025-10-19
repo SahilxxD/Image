@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Sparkles, History, User, CreditCard, Image, LogOut } from 'lucide-react';
+import { ArrowLeft, Handshake, History, User, CreditCard, Image, LogOut } from 'lucide-react';
 
 function Header({ currentScreen, setCurrentScreen, userProfile, onLogout }) {
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -52,37 +52,31 @@ function Header({ currentScreen, setCurrentScreen, userProfile, onLogout }) {
         <header className="bg-white border-b border-gray-100 px-4 py-3 sticky top-0 z-40">
             <div className="flex items-center justify-between max-w-lg mx-auto">
                 <div className="flex items-center gap-2">
-                    {currentScreen !== 'upload' && (
-                        <button
-                            onClick={() => {
-                                if (currentScreen === 'fullscreen') {
-                                    setCurrentScreen('gallery');
-                                } else if (currentScreen === 'gallery') {
-                                    setCurrentScreen('choice');
-                                } else if (currentScreen === 'choice') {
-                                    setCurrentScreen('upload');
-                                } else if (currentScreen === 'history') {
-                                    setCurrentScreen('upload');
-                                }
-                            }}
-                            className="p-2 hover:bg-gray-50 rounded-lg"
-                        >
-                            <ArrowLeft size={20} className="text-gray-600" />
-                        </button>
-                    )}
+
 
                     <div className="flex items-center gap-2">
-                        <div className="w-full h-12 rounded-lg flex items-center justify-center">
+                        <div className="w-full h-10 rounded-lg flex items-center justify-center">
                             <img
                                 src="https://ik.imagekit.io/efhehcx94/1000041191%20(1).webp?updatedAt=1759397920741"
                                 alt="ShotGenie Logo"
                                 className="w-full h-full"
+                                onClick={() => setCurrentScreen('upload')}
                             />
                         </div>
+
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 relative">
+                <div className="flex items-center gap-1 relative">
+                    {/* History Button */}
+                    <button
+                        onClick={() => setCurrentScreen('clients')}
+                        className="p-2 hover:bg-gray-50 rounded-lg"
+                        title="View History"
+                    >
+                        <Handshake size={20} className="text-gray-600" />
+                    </button>
+
                     {/* History Button */}
                     <button
                         onClick={() => setCurrentScreen('history')}

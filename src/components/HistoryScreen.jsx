@@ -2,104 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { Heart, Calendar, Filter, Sparkles } from 'lucide-react';
 import HistorySkeleton from './HistorySkeleton';
 
-function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setParentHistoryImages }) {
+function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setParentHistoryImages, clientId }) {
     const [historyImages, setHistoryImages] = useState([]);
     const [filter, setFilter] = useState('all'); // all, favorites, recent
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null); // optional error state
 
     // Mock history data - replace with actual API call
-    const mockHistoryData = [
-        {
-            id: 'hist-1',
-            url: 'https://ik.imagekit.io/efhehcx94/1000039585.png?updatedAt=1757786299011&tr=w-1080%2Ch-1080%2Cfo-auto',
-            pose: 'front',
-            type: 'on-model',
-            environment: 'studio',
-            outputType: 'catalog',
-            isHighRes: true,
-            isFavorited: true,
-            createdAt: '2025-01-15T10:30:00Z',
-            batchId: 'batch-001'
-        },
-        {
-            id: 'hist-2',
-            url: 'https://ik.imagekit.io/efhehcx94/1000039500.png?updatedAt=1757786299006&tr=w-1080%2Ch-1080%2Cfo-auto',
-            pose: 'three-quarter',
-            environment: 'studio',
-            type: 'on-model',
-            outputType: 'catalog',
-            isHighRes: true,
-            isFavorited: false,
-            createdAt: '2025-01-15T10:30:00Z',
-            batchId: 'batch-001'
-        },
-        {
-            id: 'hist-3',
-            url: 'https://ik.imagekit.io/efhehcx94/1000039767.png?updatedAt=1757786298897&tr=w-1080%2Ch-1080%2Cfo-auto',
-            pose: 'walking',
-            environment: 'outdoor',
-            type: 'on-model',
-            outputType: 'instagram',
-            isHighRes: true,
-            isFavorited: true,
-            createdAt: '2025-01-14T15:45:00Z',
-            batchId: 'batch-002'
-        },
-        {
-            id: 'hist-4',
-            url: 'https://ik.imagekit.io/efhehcx94/1000039641.png?updatedAt=1757786298791&tr=w-1080%2Ch-1080%2Cfo-auto',
-            pose: 'closeup',
-            environment: 'studio',
-            type: 'on-model',
 
-            outputType: 'catalog',
-            isHighRes: true,
-            isFavorited: false,
-            createdAt: '2025-01-14T12:20:00Z',
-            batchId: 'batch-003'
-        },
-        {
-            id: 'hist-5',
-            url: 'https://ik.imagekit.io/efhehcx94/Generated%20Image%20September%2013,%202025%20-%2012_32PM.png?updatedAt=1757787811859&tr=w-1080%2Ch-1080%2Cfo-auto',
-            pose: 'flat-lay',
-            environment: 'minimal',
-            outputType: 'catalog',
-            type: 'on-model',
-
-            isHighRes: true,
-            isFavorited: true,
-            createdAt: '2025-01-13T09:15:00Z',
-            batchId: 'batch-004'
-        },
-        {
-            id: 'hist-6',
-            url: 'https://ik.imagekit.io/efhehcx94/1000039621.png?updatedAt=1757786296927&tr=w-1080%2Ch-1080%2Cfo-auto',
-            pose: 'front',
-            environment: 'studio',
-            outputType: 'social',
-            type: 'on-model',
-            isHighRes: true,
-            isFavorited: false,
-            createdAt: '2025-01-12T16:30:00Z',
-            batchId: 'batch-005'
-        }
-    ];
 
     const fetchHistory = async (signal) => {
         setLoading(true);
         setError(null); // optional state if you have one
 
         try {
-            const res = await fetch("https://image-backend-delta.vercel.app/api/history", {
-                method: "GET",
+            // Construct URL with optional clientId param
+            const baseUrl = "https://image-backend-delta.vercel.app/api/history";
+            const url = clientId ? `${baseUrl}?clientId=${encodeURIComponent(clientId)}` : baseUrl;
+
+            // Build request options dynamically
+            const options = {
+                method: "GET", // use POST if you’re sending a body
                 headers: {
                     "Content-Type": "application/json",
-                    // If your API requires auth, add it here:
-                    "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+                    "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2U2NDk4MWQ1NDM4YWQ1Y2VmOTNlYSIsImlhdCI6MTc2MDg1OTUzMywiZXhwIjoxNzYwOTAyNzMzfQ.GPFVuI197ur5aU7Tc6zCG52UQEoHf47ZwFBXipwk1Y0`,
                 },
                 signal,
-            });
+            };
+
+            // Make the request
+            const res = await fetch(url, options);
+
 
             if (!res.ok) {
                 throw new Error(`HTTP ${res.status} ${res.statusText}`);
