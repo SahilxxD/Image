@@ -72,26 +72,51 @@ function FullscreenView({
 
     const handleDownloadClick = async () => {
         const url = selectedImage?.url;
-        if (!url) return;
+        if (!url) {
+            console.warn("No image URL available for download");
+            return;
+        }
 
         try {
-            const response = await fetch(url);
+            // Try downloading via fetch (for cross-origin-safe URLs)
+            const response = await fetch(url, { mode: "cors" });
+
+            if (!response.ok) {
+                throw new Error(`Fetch failed with status ${response.status}`);
+            }
+
             const blob = await response.blob();
             const objectUrl = URL.createObjectURL(blob);
 
-            const a = document.createElement('a');
+            const a = document.createElement("a");
             a.href = objectUrl;
-            a.download = selectedImage.filename || 'image.jpg';
+            a.download = selectedImage.filename || "image.jpg";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
 
-            // cleanup
             URL.revokeObjectURL(objectUrl);
+            console.log("Download successful via blob fetch");
         } catch (error) {
-            console.error("Download failed:", error);
+            console.error("Download via fetch failed:", error);
+
+            // 🔁 Fallback: open the direct image URL in a new tab for manual download
+            try {
+                const a = document.createElement("a");
+                a.href = url;
+                a.target = "_blank";
+                a.download = selectedImage.filename || "image.jpg";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                console.log("Fallback: opened image URL directly");
+            } catch (fallbackError) {
+                console.error("Fallback download failed:", fallbackError);
+                alert("Unable to download this image. Please right-click and 'Save image as...'");
+            }
         }
     };
+
 
     return (
         <>
