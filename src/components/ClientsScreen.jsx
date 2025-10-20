@@ -80,7 +80,7 @@ const ClientsScreen = ({ openFullscreen, toggleFavorite, setHistoryImages }) => 
                 headers: {
                     "Content-Type": "application/json",
                     // If your API requires auth, add it here:
-                    "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2U2NDk4MWQ1NDM4YWQ1Y2VmOTNlYSIsImlhdCI6MTc2MDg1OTUzMywiZXhwIjoxNzYwOTAyNzMzfQ.GPFVuI197ur5aU7Tc6zCG52UQEoHf47ZwFBXipwk1Y0`
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 },
                 signal,
             });
