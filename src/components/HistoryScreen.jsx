@@ -25,7 +25,7 @@ function HistoryScreen({ openFullscreen, toggleFavorite, setHistoryImages: setPa
                 method: "GET", // use POST if you’re sending a body
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
                 },
                 signal,
             };
